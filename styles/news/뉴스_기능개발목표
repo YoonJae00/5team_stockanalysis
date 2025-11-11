@@ -1,10 +1,36 @@
 # 크롤링 기능 구현 (파이썬이 적합할 듯)
 #   bs4(Beautiful Soup 4)라이브러리 사용, 기사 페이지에서 원하는 데이터 추출 가능.
+#  ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+#   import requests \n from bs4 import BeautifulSoup
+#   response = requests.get(url, headers={'User-Agent':'Mozilla/5.0'})
+#   soup = BeautifulSoup(response.text, 'html.parser')
+#   news_list = []
+
+#   2. 필요한 데이터 찾기 (클래스 이름은 실제 웹사이트 구조에 따라 달라질 수 있습니다!)
+#   여기서는 예시로 'news_area'와 'info_group' 등의 클래스를 가정
+#    news_items = soup.select('.news_area') 
+#   
+#   for item in news_items[:5]: # 상위 5개 뉴스만 가져오기
+#       title_tag = item.select_one('.news_title')
+#        if title_tag:
+#           title = title_tag.get('title')
+#           link = title_tag.get('href')
+#           news_list.append({'title': title, 'link': link})
+            
+#   return news_list
+
+#if __name__ == "__main__":
+    # 이 파일이 단독으로 실행될 때 테스트
+#   news = get_latest_stock_news("삼성전자")
+#   for item in news:
+#       print(f"제목: {item['title']}\n링크: {item['link']}\n---")
+#  ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
 
 # 뉴스 출처 (어느 언론사 기사를 쓸 지 )
 #   뉴스핌, 이데일리, 머니투데이 중 택 1
 #   상대적으로 짧은 기사 길이, 친절한 해설 -> 초보자가 읽기 적합.
+
 
 # 뉴스 출력 요소(ex 제목, 날짜, 링크 ...)
 #   기사를 읽을 때 초보자 TIP 추가(경제 용어, '그래서' Q&A(기사가 주가에 주는 영향 질문 및 답변) 등 )
