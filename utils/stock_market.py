@@ -1,5 +1,6 @@
 import stock_market # 주식 실시간 정보를 받아오기 위한 외부 라이브러리
 
+
 def get_stock_price(name: str ) -> float:
     """
     주식 이름을 입력받아 현재 주가를 반환하는 함수.
