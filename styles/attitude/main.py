@@ -43,7 +43,7 @@
     else:
         return None
 
-# 추천 결과 출력
+# 추천 결과 출력값
 + def print_recommendation(data: dict):
 +     """
 +     투자 성향별 추천 데이터를 보기 좋게 출력합니다.
