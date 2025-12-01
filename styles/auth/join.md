@@ -1,10 +1,14 @@
+# 기능 요약
+각 유저의 개인정보를 받아옵니다.
+
+
 회원가입 기능
 
 1. 회원가입
 
 class User
 
-funtion 회원가입 (input: id, passwd, name, age, etc...)
+function 회원가입 (input: id, passwd, name, age, etc...)
 
 1. passwd 암호화
 
