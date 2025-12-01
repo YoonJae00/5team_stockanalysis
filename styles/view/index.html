@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>초보자도 쉽게 배우는 주식 - 투자 성향 추천</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      letter-spacing: 0.02em;
+      font-family: 'Nanum Gothic', sans-serif;
+      background-color: #fffdf8;
+      margin: 0;
+      padding: 0;
+      color: #333;
+      text-align: center;
+    }
+    header {
+      background: linear-gradient(90deg, #ffe2c6, #ffd4af);
+      padding: 1.4em 0;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    }
+    h1 { 
+      color: #8d3a1f; 
+      margin: 0;
+      font-weight: bold;
+    }
+    .cards {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1.5em;
+      margin: 2.5em 0;
+    }
+    .card {
+      width: 260px;
+      padding: 1.5em;
+      background-color: white;
+      border-radius: 18px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.12);
+      cursor: pointer;
+      transition: 0.3s;
+      border: 2px solid transparent;
+      transform: scale(1);
+    }
+    .card:hover {
+      transform: scale(1.05);
+      border-color: #72b4ff;
+      box-shadow: 0 10px 20px rgba(114,180,255,0.35);
+    }
+    .card.selected {
+      border-color: #4d9dff;
+      background-color: #f1f7ff;
+      transform: scale(1.06);
+    }
+    .card h3 {
+      color: #8d3a1f;
+      margin-bottom: 0.5em;
+    }
+    #resultBox {
+      display: none;
+      margin-top: 2.5em;
+      background-color: #f4f9ff;
+      width: 85%;
+      max-width: 650px;
+      margin-inline: auto;
+      padding: 2em;
+      border-radius: 18px;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+      text-align: left;
+      animation: fadeIn 0.5s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    #resultBox h2 { color: #8d3a1f; }
+    .stock-item { margin-bottom: 0.7em; font-weight: bold; }
+    .small-desc { font-size: 0.95em; margin-bottom: 1.2em; }
+    canvas { max-width: 530px; margin-top: 1.5em; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🧺 초보자도 쉽게 배우는 주식</h1>
+  <p style="margin-top: 0.5em;">투자 성향을 선택하면 추천 정보와 차트가 바로 나와요!</p>
+</header>
+
+<section class="intro">
+  <h2>어떤 투자 스타일이 맞으신가요? 💡</h2>
+  <p>카드를 눌러보세요!</p>
+</section>
+
+<section class="cards">
+  <div class="card" data-type="배당 안정형">
+    <h3>💎 배당 안정형</h3>
+    <p>손실을 최소화하고 안정적인 배당을 선호하는 유형이에요.</p>
+  </div>
+  <div class="card" data-type="성장 기술형">
+    <h3>⚡ 성장 기술형</h3>
+    <p>AI·반도체 등 미래 기술 중심으로 빠른 수익을 노리는 유형이에요.</p>
+  </div>
+  <div class="card" data-type="생활 소비형">
+    <h3>🛒 생활 소비형</h3>
+    <p>식품·유통 등 안정적인 소비재 기업을 선호하는 유형이에요.</p>
+  </div>
+</section>
+
+<section id="resultBox">
+  <h2 id="resultTitle"></h2>
+  <p id="resultDesc" class="small-desc"></p>
+  <div id="stockList"></div>
+  <canvas id="chart"></canvas>
+</section>
+
+<script>
+  const cards = document.querySelectorAll('.card');
+  const resultBox = document.getElementById('resultBox');
+  const resultTitle = document.getElementById('resultTitle');
+  const resultDesc = document.getElementById('resultDesc');
+  const stockList = document.getElementById('stockList');
+
+  let selectedType = null;
+  let chart;
+
+  const dataSet = {
+    '배당 안정형': {
+      desc: '꾸준한 배당과 안정적 실적을 기반으로 하는 안전 투자 성향입니다.',
+      stocks: [
+        { name: 'KT&G', info: '국내 대표 고배당 기업', trend: [100,102,103,104,105] },
+        { name: '포스코퓨처엠', info: '2차전지 소재 기반 성장 + 안정성', trend: [90,92,93,95,96] }
+      ]
+    },
+    '성장 기술형': {
+      desc: 'AI, 반도체, IT 중심으로 빠른 성장 가능성을 추구하는 성향입니다.',
+      stocks: [
+        { name: '삼성전자', info: '세계적인 반도체·AI 기업', trend: [70,72,75,78,81] },
+        { name: 'NAVER', info: 'AI·클라우드·검색 기반 성장기업', trend: [60,63,65,68,70] }
+      ]
+    },
+    '생활 소비형': {
+      desc: '식품, 생활용품, 유통 중심의 안정적 소비재 기반 투자 성향입니다.',
+      stocks: [
+        { name: '오리온', info: '국내·중국 중심 글로벌 식품기업', trend: [80,82,84,86,89] },
+        { name: '이마트', info: '대형마트·유통 중심 안정기업', trend: [90,91,92,94,97] }
+      ]
+    }
+  };
+
+  cards.forEach(card => {
+    card.addEventListener('click', () => {
+      cards.forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedType = card.dataset.type;
+      showResult();
+    });
+  });
+
+  function showResult() {
+    const data = dataSet[selectedType];
+
+    resultTitle.textContent = `${selectedType} 추천 정보`;
+    resultDesc.textContent = data.desc;
+
+    stockList.innerHTML = data.stocks
+      .map(s => `<div class='stock-item'>${s.name} — <span class='small-desc'>${s.info}</span></div>`)
+      .join('');
+
+    resultBox.style.display = 'block';
+    resultBox.scrollIntoView({ behavior: 'smooth' });
+
+    const ctx = document.getElementById('chart').getContext('2d');
+    if (chart) chart.destroy();
+
+    chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['1주 전','4일 전','3일 전','2일 전','오늘'],
+        datasets: [{
+          label: data.stocks[0].name + ' 최근 주가 추세',
+          data: data.stocks[0].trend,
+          borderColor: '#4d9dff',
+          backgroundColor: 'rgba(77,157,255,0.25)',
+          fill: true,
+          tension: 0.35,
+          borderWidth: 3
+        }]
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: false } }
+      }
+    });
+  }
+</script>
+
+</body>
+</html>
